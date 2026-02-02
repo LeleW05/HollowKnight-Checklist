@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hollow Knight Checklist - Final</title>
+    <link rel="icon" type="image/png" href="icon.jpg">
+    <style>
+        /* --- CSS: VARIABILI E BASE --- */
+        :root {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --card-bg: #262626;
+            
+            /* Colore MODALITÀ NORMALE (Giallo/Arancio) */
+            --accent: #ff9d00; 
+            
+            /* Colore MODALITÀ SIMULA (Viola) */
+            --sim-color: #9b59b6;
+            
+            --text-main: #e0e0e0;
+            --text-muted: #999;
+            --border: #333;
+            --danger: #ff5555;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        aside.sidebar {
+            width: 450px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        /* Box Totale */
+        .total-container {
+            background: #333;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s;
+        }
+
+        body.sim-mode .total-container { border-color: var(--sim-color); }
+
+        .total-label { font-size: 0.8rem; text-transform:uppercase; color:#888; margin-bottom:5px; }
+        
+        .total-percent {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+            transition: color 0.3s;
+        }
+
+        .sim-total-wrapper {
+            display: none; margin-top: 10px; padding-top: 10px;
+            border-top: 1px dashed #555; animation: fadeIn 0.3s ease;
+        }
+        .sim-total-percent { font-size: 1.6rem; font-weight: bold; color: var(--sim-color); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Filtri */
+        .filters-row {
+            display: flex;
+            gap: 15px;
+        }
+        .filter-section {
+            flex: 1;
+            min-width: 0;
+            margin-bottom: 0;
+        }
+        .filter-header {
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); margin-bottom: 10px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .filter-controls button {
+            background: none; border: none; color: var(--text-main);
+            cursor: pointer; font-size: 0.75rem; padding: 2px 5px;
+        }
+        .filter-controls button:hover { color: var(--accent); }
+        .filter-item {
+            display: flex; align-items: center; cursor: pointer; padding: 4px 0; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .filter-item input {
+            margin-right: 10px; accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer;
+        }
+        .filter-label { flex: 1; font-size: 0.9rem; }
+        .filter-count {
+            font-size: 0.75rem; color: var(--text-muted); background: #2d2d2d;
+            padding: 2px 6px; border-radius: 4px;
+        }
+
+        /* --- MAIN CONTENT --- */
+        main.content {
+            flex: 1; padding: 20px 40px; overflow-y: auto;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+        }
+
+        /* Header Layout */
+        .page-header {
+            width: 100%; max-width: 900px; margin-bottom: 20px;
+            border-bottom: 1px solid var(--border); padding-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .header-left { display: flex; flex-direction: column; }
+        
+        .page-title { margin: 0; font-size: 2rem; color: var(--text-main); font-weight: 300; }
+        
+        /* Stile per "- by LeleW" */
+        .author-credit {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: normal;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .page-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
+
+        /* Contenitore Destro (Reset + Switch) */
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px; /* Spazio tra Reset e Switch */
+        }
+
+        /* Tasto Reset */
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .reset-btn:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* Switch Container */
+        .sim-switch-container { display: flex; align-items: center; gap: 10px; }
+        .sim-label { font-weight: bold; font-size: 0.9rem; color: var(--text-muted); }
+        body.sim-mode .sim-label { color: var(--sim-color); }
+
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #444; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--sim-color); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .checklist-wrapper { width: 100%; max-width: 900px; }
+        .search-bar {
+            width: 100%; padding: 12px; background: var(--card-bg);
+            border: 1px solid var(--border); color: white;
+            border-radius: 6px; margin-bottom: 20px; font-size: 1rem;
+        }
+
+        /* --- ITEM CARD --- */
+        .item-card {
+            background-color: var(--card-bg); border: 1px solid var(--border);
+            margin-bottom: 10px; padding: 15px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; transition: background 0.2s, border-color 0.2s;
+        }
+        .item-card:hover { background-color: #2a2a2a; border-color: #555; z-index: 10; }
+
+        /* Tooltip */
+        .info-box {
+            display: none; position: absolute; left: 50px; bottom: 100%; margin-bottom: 5px;
+            width: calc(100% - 100px); background-color: #111; border: 1px solid var(--accent);
+            padding: 10px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            z-index: 100; font-size: 0.9rem; color: #ddd; line-height: 1.4; pointer-events: none;
+        }
+        .info-box::after {
+            content: ""; position: absolute; top: 100%; left: 20px; border-width: 6px; border-style: solid;
+            border-color: var(--accent) transparent transparent transparent;
+        }
+        .item-card:hover .info-box:not(:empty) { display: block; }
+        body.sim-mode .info-box { border-color: var(--sim-color); }
+        body.sim-mode .info-box::after { border-color: var(--sim-color) transparent transparent transparent; }
+
+        /* Stati Card */
+        .item-card.completed { opacity: 0.5; background-color: #1a1a1a; border-left: 4px solid var(--accent); }
+        .item-card.completed .item-title { text-decoration: line-through; }
+        .item-card.completed .check-circle { background-color: var(--accent); border-color: var(--accent); }
+
+        .item-card.simulated { opacity: 0.8; background-color: #241c29; border-left: 4px solid var(--sim-color); }
+        .item-card.simulated .item-title { color: var(--sim-color); }
+        .item-card.simulated .check-circle { background-color: var(--sim-color); border-color: var(--sim-color); }
+        .item-card.simulated .check-circle::after { display: block; }
+
+        /* Layout Interno Item */
+        .item-left { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .check-circle {
+            width: 22px; height: 22px; border: 2px solid #666; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .check-circle:hover { border-color: #aaa; }
+        .check-circle::after { content: '✔'; color: #000; font-size: 14px; display: none; }
+        .item-card.completed .check-circle::after { display: block; }
+
+        .item-info { display: flex; flex-direction: column; gap: 4px; }
+        .item-title { font-weight: 600; font-size: 1rem; }
+        .item-breadcrumbs { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 5px; }
+        .crumb-item { color: #888; }
+        .crumb-sep { color: #555; }
+        
+        .item-right {
+            display: flex; align-items: center; gap: 12px;
+            min-width: 80px; justify-content: flex-end;
+        }
+
+        .wiki-btn {
+            color: #555; transition: color 0.2s, transform 0.2s; display: flex;
+            align-items: center; justify-content: center; text-decoration: none;
+        }
+        .wiki-btn:hover { color: var(--accent); transform: scale(1.1); }
+        .wiki-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .item-value { font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+        .item-card.simulated .item-value { color: var(--sim-color); }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; }
+            aside.sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+            main.content { padding: 10px; }
+            .info-box { display: none !important; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .header-right { width: 100%; align-items: flex-end; }
+
+            .filters-row { flex-direction: column; } 
+            .filter-section { margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="total-container">
+            <div class="total-label">Progresso Reale</div>
+            <div class="total-percent" id="totalPercent">0%</div>
+            <div class="sim-total-wrapper" id="simTotalWrapper">
+                <div class="total-label" style="color: var(--sim-color);">Simulazione</div>
+                <div class="sim-total-percent" id="simTotalPercent">0%</div>
+            </div>
+        </div>
+
+        <div class="filters-row">
+            
+            <div class="filter-section">
+                <div class="filter-header">
+                    Regions
+                    <div class="filter-controls">
+                        <button onclick="toggleAll('regions', true)">All</button>
+                        <button onclick="toggleAll('regions', false)">None</button>
+                    </div>
+                </div>
+                <div id="regionsContainer"></div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-header">
+                    Categories
+                    <div class="filter-controls">
+                        <button onclick="toggleAll('categories', true)">All</button>
+                        <button onclick="toggleAll('categories', false)">None</button>
+                    </div>
+                </div>
+                <div id="categoriesContainer"></div>
+            </div>
+
+        </div>
+    </aside>
+
+    <main class="content">
+        <header class="page-header">
+            <div class="header-left">
+                <h1 class="page-title">
+                    Hollow Knight Checklist 
+                    <span class="author-credit">- by LeleW</span>
+                </h1>
+                <div class="page-subtitle">Tieni traccia del 112% di completamento</div>
+            </div>
+            
+            <div class="header-right">
+                <button class="reset-btn" onclick="resetData()">Reset Progress</button>
+                
+                <div class="sim-switch-container">
+                    <span class="sim-label">SIMULATE</span>
+                    <label class="switch">
+                        <input type="checkbox" id="simModeToggle" onchange="toggleSimulationMode()" aria-label="Attiva modalità simulazione">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <div class="checklist-wrapper">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Cerca oggetto..." aria-label="Cerca oggetto" onkeyup="renderChecklist()">
+            <div id="checklistContainer"></div>
+        </div>
+    </main>
+
+    <script>
+        const database = [
+            { 
+                id: 1, 
+                name: "Broken Vessel", 
+                region: "Ancient Basin", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Monarch Wings",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Broken_Vessel" 
+            },
+            { 
+                id: 2, 
+                name: "Brooding Mawlek", 
+                region: "Forgotten Crossroads", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Mask Shard",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Brooding_Mawlek"
+            },
+            { 
+                id: 3, 
+                name: "Dung Defender", 
+                region: "Royal Waterways", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Defender's Crest",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dung_Defender"
+            },
+            { 
+                id: 4, 
+                name: "False Knight", 
+                region: "Forgotten Crossroads", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: City Crest",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/False_Knight"
+            },
+            { 
+                id: 5, 
+                name: "Grimm", 
+                region: "Dirtmouth", 
+                categories: ["Bosses"], 
+                value: 1, 
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Grimm"
+            },
+            { 
+                id: 6, 
+                name: "Gruz Mother", 
+                region: "Forgotten Crossroads", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: 50 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Gruz_Mother"
+            },
+            { 
+                id: 7, 
+                name: "Hive Knight", 
+                region: "The Hive", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Hiveblood",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Hive_Knight"
+            },
+            { 
+                id: 8, 
+                name: "Hornet Protector", 
+                region: "Greenpath", 
+                categories: ["Bosses"], 
+                value: 1,
+                info: "Reward: Mothwing Cloak",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Hornet_Protector"
+            },
+            { 
+                id: 9, 
+                name: "Hornet Sentinel", 
+                region: "Kingdom's Edge", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: King's Brand",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Hornet_Sentinel"
+            },
+            { 
+                id: 10, 
+                name: "Mantis Lords", 
+                region: "Fungal Wastes", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Mark of Pride",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mantis_Lords"
+            },
+            { 
+                id: 11, 
+                name: "Nosk", 
+                region: "Deepnest", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Pale Ore",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nosk"
+            },
+            { 
+                id: 12, 
+                name: "Soul Master", 
+                region: "City of Tears", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Desolate Dive",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Soul_Master"
+            },
+            { 
+                id: 13, 
+                name: "The Collector", 
+                region: "City of Tears", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: Collector's Map",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Collector"
+            },
+            { 
+                id: 14, 
+                name: "Traitor Lord", 
+                region: "Queen's Gardens", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: 1 White Fragment",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Traitor_Lord"
+            },
+            { 
+                id: 15, 
+                name: "Uumuu", 
+                region: "Fog Canyon", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: access to Monomon the Teacher",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Uumuu"
+            },
+            { 
+                id: 16, 
+                name: "Watcher Knight", 
+                region: "City of Tears", 
+                categories: ["Bosses"], 
+                value: 1, 
+                info: "Reward: access to Lurien the Watcher & 665 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Watcher_Knight"
+            },
+
+
+            { 
+                id: 17, 
+                name: "Mothwing Cloak", 
+                region: "Forgotten Crossroads", 
+                categories: ["Equipment"], 
+                value: 2, 
+                info: "Reward from defeating Hornet Protector",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mothwing_Cloak"
+            },
+            { 
+                id: 18, 
+                name: "Mantis Claw", 
+                region: "Forgotten Crossroads", 
+                categories: ["Equipment"], 
+                value: 2, 
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mantis_Claw"
+            },
+            { 
+                id: 19, 
+                name: "Crystal Heart", 
+                region: "Crystal Peak", 
+                categories: ["Equipment"], 
+                value: 2, 
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Crystal_Heart"
+            },
+            { 
+                id: 20, 
+                name: "Isma's Tear", 
+                region: "Royal Waterways", 
+                categories: ["Equipment"], 
+                value: 2, 
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Isma%27s_Tear"
+            },
+            { 
+                id: 21, 
+                name: "King's Brand", 
+                region: "Kingdom's Edge", 
+                categories: ["Equipment"], 
+                value: 2, 
+                info: "Reward from defeating Hornet Sentinel",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/King%27_Brand"
+            },
+            { 
+                id: 22, 
+                name: "Monarch Wings", 
+                region: "Ancient Basin", 
+                categories: ["Equipment"], 
+                value: 2, 
+                info: "Reward from defeating Broken Vessel",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Monarch_Wings"
+            },
+            { 
+                id: 23, 
+                name: "Shade Cloak", 
+                region: "The Abyss", 
+                categories: ["Equipment"], 
+                value: 2, 
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Shade_Cloak"
+            },
+
+            
+            { 
+                id: 24, 
+                name: "Vengeful Spirit", 
+                region: "Forgotten Crossroads", 
+                categories: ["Spells"], 
+                value: 1,
+                info: "Located in Ancestral Mound", 
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vengeful_Spirit"
+            },
+            { 
+                id: 25, 
+                name: "Shade Soul", 
+                region: "City of Tears", 
+                categories: ["Spells"], 
+                value: 1,
+                info: "Locked behind Elegant Door",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Shade_Soul"
+            },
+            { 
+                id: 26, 
+                name: "Desolate Dive", 
+                region: "City of Tears", 
+                categories: ["Spells"], 
+                value: 1,
+                info: "Reward from defeating Soul Master",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Desolate_Dive"
+            },
+            { 
+                id: 27, 
+                name: "Descending Dark", 
+                region: "Crystal Peak", 
+                categories: ["Spells"], 
+                value: 1,
+                info: "Located in Crystallized Mound",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Descending_Dark"
+            },
+            { 
+                id: 28, 
+                name: "Howling Wraiths", 
+                region: "Fog Canyon", 
+                categories: ["Spells"], 
+                value: 1,
+                info: "Located in Overgrown Mound",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Howling_Wraiths"
+            },
+            { 
+                id: 29, 
+                name: "Abyss Shriek", 
+                region: "The Abyss", 
+                categories: ["Spells"], 
+                value: 1,
+                info: "Locked behind Abyss Door",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Abyss_Shriek"
+            },
+
+
+            { 
+                id: 30, 
+                name: "Dream Nail", 
+                region: "Resting Grounds", 
+                categories: ["Seer"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dream_Nail"
+            },
+            { 
+                id: 31, 
+                name: "Awoken Dream Nail", 
+                region: "Resting Grounds", 
+                categories: ["Seer"], 
+                value: 1,
+                info: "Collect 1800 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dream_Nail"
+            },
+            { 
+                id: 32, 
+                name: "Hear the Seer's final words", 
+                region: "Resting Grounds", 
+                categories: ["Seer"], 
+                value: 1,
+                info: "Collect 2400 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dream_Nail"
+            },
+            
+            
+            { 
+                id: 33, 
+                name: "Sharpened Nail", 
+                region: "City of Tears", 
+                categories: ["Nail"], 
+                value: 1,
+                info: "Price: 250 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nail"
+            },
+            { 
+                id: 34, 
+                name: "Channelled Nail", 
+                region: "City of Tears", 
+                categories: ["Nail"], 
+                value: 1,
+                info: "Price: 800 geo & 1 Pale Ore",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nail"
+            },
+            { 
+                id: 35, 
+                name: "Coiled Nail", 
+                region: "City of Tears", 
+                categories: ["Nail"], 
+                value: 1,
+                info: "Price: 2000 geo & 2 Pale Ore",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nail"
+            },
+            { 
+                id: 36, 
+                name: "Pure Nail", 
+                region: "City of Tears", 
+                categories: ["Nail"], 
+                value: 1,
+                info: "Price: 4000 geo & 3 Pale Ore",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nail"
+            },
+
+            
+            { 
+                id: 37, 
+                name: "Cyclone Slash", 
+                region: "Howling Cliffs", 
+                categories: ["Nail Arts"], 
+                value: 1,
+                info: "Interact with Nailmaster Mato",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Cyclone_Slash"
+            },
+            { 
+                id: 38, 
+                name: "Dash Slash", 
+                region: "Kingdom's Edge", 
+                categories: ["Nail Arts"], 
+                value: 1,
+                info: "Purchase from Nailmaster Oro for 800 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dash_Slash"
+            },
+            { 
+                id: 39, 
+                name: "Great Slash", 
+                region: "Greenpath", 
+                categories: ["Nail Arts"], 
+                value: 1,
+                info: "Interact with Nailmaster Sheo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Great_Slash"
+            },
+
+            
+            { 
+                id: 40, 
+                name: "Mask Shard", 
+                region: "Dirtmouth", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Purchase from Sly for 150 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 41, 
+                name: "Mask Shard", 
+                region: "Dirtmouth", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Purchase from Sly for 500 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 42, 
+                name: "Mask Shard", 
+                region: "Dirtmouth", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Purchase from Sly for 800 geo. Requires Shopkeeper's Key",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 43, 
+                name: "Mask Shard", 
+                region: "Dirtmouth", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Purchase from Sly for 1500 geo. Requires Shopkeeper's Key",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 44, 
+                name: "Mask Shard", 
+                region: "Forgotten Crossroads", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Reward from defeating Brooding Mawleck",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 45, 
+                name: "Mask Shard", 
+                region: "Forgotten Crossroads", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Reward from Grubfather after rescuing 5 grubs",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 46, 
+                name: "Mask Shard", 
+                region: "Forgotten Crossroads", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Located in the Goam Room",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 47, 
+                name: "Mask Shard", 
+                region: "Fungal Wastes", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Located in Queen's Station",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 48, 
+                name: "Mask Shard", 
+                region: "Dirtmouth", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Located in Bretta's House",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 49, 
+                name: "Mask Shard", 
+                region: "Greenpath", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Located in Stone Sanctuary",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 50, 
+                name: "Mask Shard", 
+                region: "Royal Waterways", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 51, 
+                name: "Mask Shard", 
+                region: "Deepnest", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 52, 
+                name: "Mask Shard", 
+                region: "Crystal Peak", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Reward from defeating Enraged Guardian",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 53, 
+                name: "Mask Shard", 
+                region: "The Hive", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Located behind a breakable wall",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 54, 
+                name: "Mask Shard", 
+                region: "Resting Grounds", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Reward from collecting 1500 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shards"
+            },
+            { 
+                id: 55, 
+                name: "Mask Shard", 
+                region: "Resting Grounds", 
+                categories: ["Mask Shards"], 
+                value: 0.25,
+                info: "Reward from completing Flower Quest",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Mask_Shard"
+            },
+
+            
+            { 
+                id: 56, 
+                name: "Vessel Fragment", 
+                region: "Dirtmouth", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Purchase from Sly for 550 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 57, 
+                name: "Vessel Fragment", 
+                region: "Dirtmouth", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Purchase from Sly for 900 geo. Requires Shopkeeper's Key",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 58, 
+                name: "Vessel Fragment", 
+                region: "Greenpath", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Located near Queen's Gardens entrance",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 59, 
+                name: "Vessel Fragment", 
+                region: "Forgotten Crossroads", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Located near the east lift",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 60, 
+                name: "Vessel Fragment", 
+                region: "City of Tears", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Located near the east lift",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 61, 
+                name: "Vessel Fragment", 
+                region: "Deepnest", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Located above the tram station",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 62, 
+                name: "Vessel Fragment", 
+                region: "Howling Cliffs", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Located in the Stag Nest",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 63, 
+                name: "Vessel Fragment", 
+                region: "Resting Grounds", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Reward from collecting 700 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+            { 
+                id: 64, 
+                name: "Vessel Fragment", 
+                region: "Ancient Basin", 
+                categories: ["Vessel Fragments"], 
+                value: 1/3,
+                info: "Reward from tossing 3000 geo in the fountain",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Vessel_Fragment"
+            },
+
+            
+            {
+                id: 65, 
+                name: "Baldur Shell", 
+                region: "Howling Cliffs", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Baldur_Shell"
+            },
+            {
+                id: 66, 
+                name: "Dashmaster", 
+                region: "Fungal Wastes", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dashmaster"
+            },
+            {
+                id: 67, 
+                name: "Deep Focus", 
+                region: "Crystal Peak", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Deep_Focus"
+            },
+            {
+                id: 68, 
+                name: "Defender's Crest", 
+                region: "Royal Waterways", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from defeating Dung Defender",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Defender%27s_Crest"
+            },
+            {
+                id: 69, 
+                name: "Dream Wielder", 
+                region: "Resting Grounds", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from collecting 500 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dream_Wielder"
+            },
+            {
+                id: 70, 
+                name: "Dreamshield", 
+                region: "Resting Grounds", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Dreamshield"
+            },
+            {
+                id: 71, 
+                name: "Flukenest", 
+                region: "Royal Waterways", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from defeating Flukemarm",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Flukenest"
+            },
+            {
+                id: 72, 
+                name: "Fragile/Unbreakable Greed", 
+                region: "Fungal Wastes", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Leg Eater for 250 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Fragile_Greed"
+            },
+            {
+                id: 73, 
+                name: "Fragile/Unbreakable Heart", 
+                region: "Fungal Wastes", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Leg Eater for 350 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Fragile_Heart"
+            },
+            {
+                id: 74, 
+                name: "Fragile/Unbreakable Strength", 
+                region: "Fungal Wastes", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Leg Eater for 600 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Fragile_Strength"
+            },
+            {
+                id: 75, 
+                name: "Fury of the Fallen", 
+                region: "King's Pass", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Fury_of_the_Fallen"
+            },
+            {
+                id: 76, 
+                name: "Gathering Swarm", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Sly for 300 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Gathering_Swarm"
+            },
+            {
+                id: 77, 
+                name: "Glowing Womb", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Glowing_Womb"
+            },
+            {
+                id: 78, 
+                name: "Grimmchild / Carefree Melody", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from Grimm after summoning the Troupe",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Grimmchild"
+            },
+            {
+                id: 79, 
+                name: "Grubberfly's Elegy", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from Grubfather after rescuing all 46 grubs",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Grubberfly%27s_Elegy"
+            },
+            {
+                id: 80, 
+                name: "Grubsong", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from Grubfather after rescuing 10 grubs",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Grubsong"
+            },
+            {
+                id: 81, 
+                name: "Heavy Blow", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Sly for 350 geo. Requires Shopkeeper's Key",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Heavy_Blow"
+            },
+            {
+                id: 82, 
+                name: "Hiveblood", 
+                region: "The Hive", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from defeating Hive Knight",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Hiveblood"
+            },
+            {
+                id: 83, 
+                name: "Joni's Blessing", 
+                region: "Howling Cliffs", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Joni%27s_Blessing"
+            },
+            {
+                id: 84, 
+                name: "Kingsoul / Void Heart", 
+                region: "Ancient Basin", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Kingsoul"
+            },
+            {
+                id: 85, 
+                name: "Lifeblood Core", 
+                region: "The Abyss", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Lifeblood_Core"
+            },
+            {
+                id: 86, 
+                name: "Lifeblood Heart", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Salubra for 250 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Lifeblood_Heart"
+            },
+            {
+                id: 87, 
+                name: "Longnail", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Salubra for 300 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Longnail"
+            },
+            {
+                id: 88, 
+                name: "Mark of Pride", 
+                region: "Fungal Wastes", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from defeating Mantis Lords",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Longnail"
+            },
+            {
+                id: 89, 
+                name: "Nailmaster's Glory", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Reward from Sly after receiving all 3 Nail Arts",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nailmaster%27s_Glory"
+            },
+            {
+                id: 90, 
+                name: "Quick Focus", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Salubra for 800 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Quick_Focus"
+            },
+            {
+                id: 91, 
+                name: "Quick Slash", 
+                region: "Kingdom's Edge", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Quick_Slash"
+            },
+            {
+                id: 92, 
+                name: "Shaman Stone", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Salubra for 220 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Shaman_Stone"
+            },
+            {
+                id: 93, 
+                name: "Shape of Unn", 
+                region: "Greenpath", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Shape_of_Unn"
+            },
+            {
+                id: 94, 
+                name: "Sharp Shadow", 
+                region: "Deepnest", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Sharp_Shadow"
+            },
+            {
+                id: 95, 
+                name: "Soul Catcher", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Soul_Catcher"
+            },
+            {
+                id: 96, 
+                name: "Soul Eater", 
+                region: "Resting Grounds", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Soul_Eater"
+            },
+            {
+                id: 97, 
+                name: "Spell Twister", 
+                region: "City of Tears", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Spell_Twister"
+            },
+            {
+                id: 98, 
+                name: "Spore Shroom", 
+                region: "Fungal Wastes", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Spore_Shroom"
+            },
+            {
+                id: 99, 
+                name: "Sprintmaster", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Sly for 400 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Sprintmaster"
+            },
+            {
+                id: 100, 
+                name: "Stalwart Shell", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Sly for 200 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Stalwart_Shell"
+            },
+            {
+                id: 101, 
+                name: "Steady Body", 
+                region: "Forgotten Crossroads", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Salubra for 120 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Steady_Body"
+            },
+            {
+                id: 102, 
+                name: "Thorns of Agony", 
+                region: "Greenpath", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Thorns_of_Agony"
+            },
+            {
+                id: 103, 
+                name: "Wayward Compass", 
+                region: "Dirtmouth", 
+                categories: ["Charms"], 
+                value: 1,
+                info: "Purchase from Iselda for 220 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Wayward_Compass"
+            },
+            {
+                id: 104, 
+                name: "Weaversong", 
+                region: "Deepnest", 
+                categories: ["Charms"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Weaversong"
+            },
+
+
+            {
+                id: 105, 
+                name: "Herrah the Beast", 
+                region: "Deepnest", 
+                categories: ["Dreamers"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Herrah"
+            },
+            {
+                id: 106, 
+                name: "Lurien the Watcher", 
+                region: "City of Tears", 
+                categories: ["Dreamers"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Lurien"
+            },
+            {
+                id: 107, 
+                name: "Monomon the Teacher", 
+                region: "Fog Canyon", 
+                categories: ["Dreamers"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Monomon"
+            },
+
+            
+            {
+                id: 108, 
+                name: "Elder Hu", 
+                region: "Fungal Wastes", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 100 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Elder_Hu"
+            },
+            {
+                id: 109, 
+                name: "Galien", 
+                region: "Deepnest", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 200 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Galien"
+            },
+            {
+                id: 110, 
+                name: "Gorb", 
+                region: "Howling Cliffs", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 100 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Gorb"
+            },
+            {
+                id: 111, 
+                name: "Markoth", 
+                region: "Kingdom's Edge", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 250 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Markoth"
+            },
+            {
+                id: 112, 
+                name: "Marmu", 
+                region: "Queen's Gardens", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 150 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Marmu"
+            },
+            {
+                id: 113, 
+                name: "No Eyes", 
+                region: "Greenpath", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 200 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/No_Eyes"
+            },
+            {
+                id: 114, 
+                name: "Xero", 
+                region: "Resting Grounds", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                info: "Reward: 100 essence",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Xero"
+            },
+            {
+                id: 115, 
+                name: "Nightmare King Grimm", 
+                region: "Dirtmouth", 
+                categories: ["Dream Warriors"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Nightmare_King_Grimm"
+            },
+
+            
+            {
+                id: 116, 
+                name: "Trial of the Warrior", 
+                region: "Kingdom's Edge", 
+                categories: ["Colosseum"], 
+                value: 1,
+                info: "Reward: 1 Charm Notch & ~1000 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Trial_of_the_Warrior"
+            },
+            {
+                id: 117, 
+                name: "Trial of the Conqueror", 
+                region: "Kingdom's Edge", 
+                categories: ["Colosseum"], 
+                value: 1,
+                info: "Reward: 1 Pale Ore & ~2000 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Trial_of_the_Conqueror"
+            },
+            {
+                id: 118, 
+                name: "Trial of the Fool", 
+                region: "Kingdom's Edge", 
+                categories: ["Colosseum"], 
+                value: 1,
+                info: "Reward: ~3000 geo",
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Trial_of_the_Fool"
+            },
+
+
+            
+            {
+                id: 119, 
+                name: "Find Godhome", 
+                region: "Royal Waterways", 
+                categories: ["Pantheons"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Godhome"
+            },
+            {
+                id: 120, 
+                name: "Pantheon of the Master", 
+                region: "Godhome", 
+                categories: ["Pantheons"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Pantheon_of_the_Master"
+            },
+            {
+                id: 121, 
+                name: "Pantheon of the Artist", 
+                region: "Godhome", 
+                categories: ["Pantheons"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Pantheon_of_the_Artist"
+            },
+            {
+                id: 122, 
+                name: "Pantheon of the Sage", 
+                region: "Godhome", 
+                categories: ["Pantheons"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Pantheon_of_the_Sage"
+            },
+            {
+                id: 123, 
+                name: "Pantheon of the Knight", 
+                region: "Godhome", 
+                categories: ["Pantheons"], 
+                value: 1,
+                wikiUrl: "https://hollowknight.fandom.com/wiki/Pantheon_of_the_Knight"
+            },
+        ];
+
+        // --- STATO ---
+        let completedIds = new Set();
+        let simulatedIds = new Set();
+        let isSimMode = false;
+        let activeRegions = new Set();
+        let activeCategories = new Set();
+        let allRegions = [];
+        let allCategories = [];
+
+        function init() {
+            const saved = localStorage.getItem('hk_checklist_v3');
+            if (saved) completedIds = new Set(JSON.parse(saved));
+
+            const regSet = new Set();
+            const catSet = new Set();
+            database.forEach(item => {
+                regSet.add(item.region);
+                item.categories.forEach(c => catSet.add(c));
+            });
+            allRegions = Array.from(regSet).sort();
+            allCategories = Array.from(catSet).sort();
+            allRegions.forEach(r => activeRegions.add(r));
+            allCategories.forEach(c => activeCategories.add(c));
+
+            renderFilterUI();
+            renderChecklist();
+            updateStats();
+        }
+
+        // --- RESET DATI ---
+        function resetData() {
+            if(confirm("Sei sicuro di voler resettare tutti i progressi? L'azione è irreversibile.")) {
+                // Cancella localStorage
+                localStorage.removeItem('hk_checklist_v3');
+                // Resetta stato in memoria
+                completedIds.clear();
+                simulatedIds.clear();
+                
+                // Aggiorna UI
+                renderChecklist();
+                updateStats();
+                renderFilterUI();
+            }
+        }
+
+        function toggleSimulationMode() {
+            const toggle = document.getElementById('simModeToggle');
+            isSimMode = toggle.checked;
+
+            if (isSimMode) {
+                document.body.classList.add('sim-mode');
+                document.getElementById('simTotalWrapper').style.display = 'block';
+            } else {
+                document.body.classList.remove('sim-mode');
+                document.getElementById('simTotalWrapper').style.display = 'none';
+                simulatedIds.clear();
+            }
+            renderChecklist();
+            updateStats();
+            renderFilterUI();
+        }
+
+        function renderFilterUI() {
+            const rContainer = document.getElementById('regionsContainer');
+            const cContainer = document.getElementById('categoriesContainer');
+            rContainer.innerHTML = ''; 
+            cContainer.innerHTML = '';
+
+            const countFound = (items) => {
+                return items.filter(i => {
+                    const isReal = completedIds.has(i.id);
+                    const isSim = isSimMode && simulatedIds.has(i.id);
+                    return isReal || isSim;
+                }).length;
+            };
+
+            allRegions.forEach(reg => {
+                const itemsInRegion = database.filter(i => i.region === reg);
+                const total = itemsInRegion.length;
+                const found = countFound(itemsInRegion);
+                
+                rContainer.innerHTML += createFilterHtml('region', reg, found, total, activeRegions.has(reg));
+            });
+
+            allCategories.forEach(cat => {
+                const itemsInCat = database.filter(i => i.categories.includes(cat));
+                const total = itemsInCat.length;
+                const found = countFound(itemsInCat);
+                
+                cContainer.innerHTML += createFilterHtml('category', cat, found, total, activeCategories.has(cat));
+            });
+        }
+
+        function createFilterHtml(type, name, found, total, isChecked) {
+            return `
+                <div class="filter-item" onclick="toggleFilter('${type}', '${name}')">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} readonly aria-label="Filtra per ${name}">
+                    <span class="filter-label">${name}</span>
+                    <span class="filter-count">${found}/${total}</span>
+                </div>
+            `;
+        }
+
+        function toggleFilter(type, name) {
+            const set = (type === 'region') ? activeRegions : activeCategories;
+            if (set.has(name)) set.delete(name); else set.add(name);
+            renderFilterUI(); renderChecklist();
+        }
+
+        function toggleAll(type, enable) {
+            if (type === 'regions') {
+                activeRegions.clear(); if(enable) allRegions.forEach(r => activeRegions.add(r));
+            } else {
+                activeCategories.clear(); if(enable) allCategories.forEach(c => activeCategories.add(c));
+            }
+            renderFilterUI(); renderChecklist();
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+
+            const sortedDatabase = [...database].sort((a, b) => b.value - a.value );
+
+            sortedDatabase.forEach(item => {
+                if (!item.name.toLowerCase().includes(searchText)) return;
+                const isRegionActive = activeRegions.has(item.region);
+                const isCategoryActive = item.categories.some(cat => activeCategories.has(cat));
+                if (!isRegionActive || !isCategoryActive) return;
+
+                const isRealCompleted = completedIds.has(item.id);
+                const isSimulated = simulatedIds.has(item.id);
+
+                let cardClass = 'item-card';
+                if (isRealCompleted) cardClass += ' completed';
+                else if (isSimulated && isSimMode) cardClass += ' simulated';
+
+                const card = document.createElement('div');
+                card.className = cardClass;
+                card.onclick = () => handleItemClick(item.id);
+
+                const catString = item.categories.join(", ");
+                const infoText = item.info || "";
+                
+                const wikiBtnHtml = item.wikiUrl ? `
+                    <a href="${item.wikiUrl}" target="_blank" class="wiki-btn" title="Apri Wiki" onclick="event.stopPropagation()">
+                        <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5c-1.11 0-2 .89-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7z"/></svg>
+                    </a>
+                ` : '';
+
+                card.innerHTML = `
+                    <div class="info-box">${infoText}</div>
+                    <div class="item-left">
+                        <div class="check-circle"></div>
+                        <div class="item-info">
+                            <span class="item-title">${item.name}</span>
+                            <div class="item-breadcrumbs">
+                                <span class="crumb-item">${item.region}</span>
+                                <span class="crumb-sep">•</span>
+                                <span class="crumb-item">${catString}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="item-value">${item.value > 0 ? parseFloat(item.value.toFixed(2)) + '%' : ''}</span>
+                        ${wikiBtnHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function handleItemClick(id) {
+            if (isSimMode) {
+                if (completedIds.has(id)) return;
+                if (simulatedIds.has(id)) simulatedIds.delete(id);
+                else simulatedIds.add(id);
+            } else {
+                if (completedIds.has(id)) completedIds.delete(id);
+                else completedIds.add(id);
+                localStorage.setItem('hk_checklist_v3', JSON.stringify(Array.from(completedIds)));
+            }
+            renderChecklist();
+            updateStats();
+            renderFilterUI();
+        }
+
+        function updateStats() {
+            let realTotal = 0;
+            let simTotalAdded = 0;
+
+            completedIds.forEach(id => {
+                const item = database.find(i => i.id === id);
+                if (item) realTotal += item.value;
+            });
+
+            if (isSimMode) {
+                simulatedIds.forEach(id => {
+                    const item = database.find(i => i.id === id);
+                    if (item) simTotalAdded += item.value;
+                });
+            }
+
+            document.getElementById('totalPercent').innerText = realTotal.toFixed(2) + '%';
+            if (isSimMode) {
+                document.getElementById('simTotalPercent').innerText = (realTotal + simTotalAdded).toFixed(2) + '%';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
