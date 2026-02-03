@@ -172,6 +172,8 @@
         .sim-switch-container { display: flex; align-items: center; gap: 10px; }
         .sim-label { font-weight: bold; font-size: 0.9rem; color: var(--text-muted); }
         body.sim-mode .sim-label { color: var(--sim-color); }
+        .hide-done-label { font-weight: bold; font-size: 0.9rem; color: var(--text-muted); transition: color 0.3s;}
+        body.hide-done-active .hide-done-label { color: var(--accent); }
 
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -184,7 +186,6 @@
             background-color: white; transition: .4s; border-radius: 50%;
         }
         input:checked + .slider { background-color: var(--sim-color); }
-        #hideCompletedToggle:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(26px); }
 
         .checklist-wrapper { width: 100%; max-width: 900px; }
@@ -326,7 +327,7 @@
                 <button class="reset-btn" onclick="resetData()">Reset Progress</button>
 
                 <div class="sim-switch-container">
-                    <span class="sim-label">HIDE DONE</span>
+                    <span class="hide-done-label">HIDE DONE</span>
                     <label class="switch">
                         <input type="checkbox" id="hideCompletedToggle" onchange="toggleHideCompleted()" aria-label="Nascondi completati">
                         <span class="slider"></span>
@@ -1516,6 +1517,13 @@
         function toggleHideCompleted() {
             const toggle = document.getElementById('hideCompletedToggle');
             hideCompleted = toggle.checked;
+            
+            if (hideCompleted) {
+                document.body.classList.add('hide-done-active');
+            } else {
+                document.body.classList.remove('hide-done-active');
+            }
+
             renderChecklist();
         }
 
@@ -1673,6 +1681,7 @@
     </script>
 </body>
 </html>
+
 
 
 
