@@ -318,7 +318,7 @@
                     Hollow Knight Checklist 
                     <span class="author-credit">- by LeleW</span>
                 </h1>
-                <div class="page-subtitle">Keep track of your adventure without worrying about website resets! This site uses your browser to memorize progresss</div>
+                <div class="page-subtitle">Keep track of your adventure without worrying about website resets! This site uses your browser to memorize progress</div>
             </div>
             
             <div class="header-right">
@@ -1451,7 +1451,7 @@
         let allCategories = [];
 
         function init() {
-            const saved = localStorage.getItem('hk_checklist_v3');
+            const saved = localStorage.getItem('hk_checklist_LW');
             if (saved) completedIds = new Set(JSON.parse(saved));
 
             const regSet = new Set();
@@ -1474,7 +1474,7 @@
         function resetData() {
             if(confirm("Sei sicuro di voler resettare tutti i progressi? L'azione è irreversibile.")) {
                 // Cancella localStorage
-                localStorage.removeItem('hk_checklist_v3');
+                localStorage.removeItem('hk_checklist_LW');
                 // Resetta stato in memoria
                 completedIds.clear();
                 simulatedIds.clear();
@@ -1622,7 +1622,7 @@
             } else {
                 if (completedIds.has(id)) completedIds.delete(id);
                 else completedIds.add(id);
-                localStorage.setItem('hk_checklist_v3', JSON.stringify(Array.from(completedIds)));
+                localStorage.setItem('hk_checklist_LW', JSON.stringify(Array.from(completedIds)));
             }
             renderChecklist();
             updateStats();
@@ -1655,5 +1655,6 @@
     </script>
 </body>
 </html>
+
 
 
