@@ -323,6 +323,14 @@
             
             <div class="header-right">
                 <button class="reset-btn" onclick="resetData()">Reset Progress</button>
+
+                <div class="sim-switch-container">
+                    <span class="sim-label">HIDE DONE</span>
+                    <label class="switch">
+                        <input type="checkbox" id="hideCompletedToggle" onchange="toggleHideCompleted()" aria-label="Nascondi completati">
+                        <span class="slider"></span>
+                    </label>
+                </div>
                 
                 <div class="sim-switch-container">
                     <span class="sim-label">SIMULATE</span>
@@ -1445,6 +1453,7 @@
         let completedIds = new Set();
         let simulatedIds = new Set();
         let isSimMode = false;
+        let hideCompleted = false;
         let activeRegions = new Set();
         let activeCategories = new Set();
         let allRegions = [];
@@ -1501,6 +1510,12 @@
             renderChecklist();
             updateStats();
             renderFilterUI();
+        }
+
+        function toggleHideCompleted() {
+            const toggle = document.getElementById('hideCompletedToggle');
+            hideCompleted = toggle.checked;
+            renderChecklist();
         }
 
         function renderFilterUI() {
@@ -1574,6 +1589,8 @@
 
                 const isRealCompleted = completedIds.has(item.id);
                 const isSimulated = simulatedIds.has(item.id);
+
+                if (hideCompleted && isRealCompleted) return;
 
                 let cardClass = 'item-card';
                 if (isRealCompleted) cardClass += ' completed';
@@ -1655,6 +1672,7 @@
     </script>
 </body>
 </html>
+
 
 
 
