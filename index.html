@@ -115,6 +115,17 @@
             padding: 2px 6px; border-radius: 4px;
         }
 
+        .filter-item.all-done .filter-label {
+            color: var(--accent);
+            text-shadow: 0 0 5px rgba(255, 157, 0, 0.2);
+        }
+        
+        .filter-item.all-done .filter-count {
+            background-color: var(--accent);
+            color: #000;
+            font-weight: bold;
+        }
+
         /* --- MAIN CONTENT --- */
         main.content {
             flex: 1; padding: 20px 40px; overflow-y: auto;
@@ -1560,8 +1571,13 @@
         }
 
         function createFilterHtml(type, name, found, total, isChecked) {
+            const safeName = name.replace(/'/g, "\\'");
+
+            const isCompleted = (total > 0 && found === total);
+            const completedClass = isCompleted ? 'all-done' : '';
+
             return `
-                <div class="filter-item" onclick="toggleFilter('${type}', '${name}')">
+                <div class="filter-item ${completedClass}" onclick="toggleFilter('${type}', '${safeName}')">
                     <input type="checkbox" ${isChecked ? 'checked' : ''} readonly aria-label="Filtra per ${name}">
                     <span class="filter-label">${name}</span>
                     <span class="filter-count">${found}/${total}</span>
@@ -1682,10 +1698,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
